@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request
 import os
 
-from backend.model import detect_clothing, add_to_wardrobe_json, save_image
+
 from backend.database import db, Clothing, init_db_app 
+from backend.prediction_model_resnet18 import detect_clothing, save_image
 
 app = Flask(__name__)
 
