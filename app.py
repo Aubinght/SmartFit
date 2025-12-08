@@ -3,7 +3,9 @@ import os
 
 
 from backend.database import db, Clothing, init_db_app 
-from backend.prediction_model_resnet18 import detect_clothing, save_image
+from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color
+
+from backend.recommender import get_same_colors
 
 app = Flask(__name__)
 
@@ -32,7 +34,8 @@ def upload():
         if file :
             filepath = save_image(file)
             category = detect_clothing(filepath)
-            new_item = Clothing(image_path=filepath, category=category)
+            item_color = detect_color(filepath)
+            new_item = Clothing(image_path=filepath, category=category, color=item_color)
             db.session.add(new_item)
             db.session.commit()
         
@@ -43,5 +46,11 @@ def wardrobe():
     all_clothes = Clothing.query.all()
     
     return render_template('wardrobe.html', clothes=all_clothes)
+
+@app.route('/recommendation/<color>')
+def recommendation(color):
+    recommended_clothes = get_same_colors(color)
+    return render_template('recommendation.html', recommendations=recommended_clothes)
+
 if __name__ == '__main__':
     app.run(debug=True)

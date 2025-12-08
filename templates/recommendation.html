@@ -1,0 +1,145 @@
+<html>
+    <head>  
+        <title>Suggestions - SmartFit</title>
+        <style>
+            /* Vos styles CSS existants */
+            .header {
+                background-color: #b7e9eb; 
+                padding: 10px; 
+                text-align: center; 
+                }
+
+            .header h1 a {
+                text-decoration: none;
+                font-size: 1em; /* Big title */
+                color: #000; /* Black text */
+                margin: 0; /* Remove default margin */
+            }
+            
+            nav {
+                background-color: #b7e9eb; 
+                padding: 10px 0; 
+                text-align: center; 
+                }
+
+            nav ul {
+                list-style-type: none;  /* puces*/
+                margin: 0; 
+                padding: 0; 
+                display: flex;   /* Pour un menu horizontal */
+                justify-content: center; 
+            }
+
+            nav li {
+                margin: 0 15px; /*espace entre chaque elt de la liste */
+            }
+
+            nav li a {
+                text-decoration: none; /* Soulignement*/
+                color: #333; 
+                font-weight: 600; 
+                padding: 5px 10px;
+                background-color: #86b9bb;
+                border-radius: 3px;
+            }
+
+            nav li a:hover {
+                color: #628bb6; 
+            }
+            /* ... (Autres styles non pertinents pour la suggestion mais maintenus) ... */
+            .gallery {
+                    padding: 20px;
+                    text-align: center;
+                }
+
+            .gallery h2 {
+                font-size: 1.5em;
+                margin-bottom: 20px;
+            }
+
+            .suggestions-list {
+                display: flex;
+                flex-wrap: wrap; /* Permet aux cartes de passer à la ligne */
+                justify-content: center;
+                gap: 20px; /* Espace entre les cartes */
+                padding: 20px;
+            }
+
+            .suggestion-card {
+                border: 1px solid #ccc;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 180px; /* Taille fixe pour chaque carte */
+                box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+                border-radius: 5px;
+            }
+
+            .suggestion-card img {
+                width: 150px;
+                height: 150px;
+                object-fit: cover;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            /* ... (Fin de vos styles existants) ... */
+
+        </style>
+    </head>
+    
+    <body>
+        <header class="header">
+            <h1><a href="{{ url_for('homepage') }}">SmartFit</a></h1>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('homepage') }}">Accueil</a></li>
+                <li><a href="{{ url_for('upload') }}">Ajouter un Vêtement</a></li>
+                <li><a href="{{ url_for('wardrobe') }}">Ma Garde-Robe</a></li>
+                <li><a href="{{ url_for('wardrobe') }}">Suggestions</a></li> 
+            </ul>
+        </nav>
+
+        <hr>
+
+        <main style="text-align: center; padding: 20px;">
+            <h1>Suggestions d'Articles de Même Couleur</h1>
+
+            <section class="reference-item">
+                <h2>Vêtement de Référence</h2>
+                <p>
+                    Catégorie: <strong>{{ reference_item.category }}</strong> | 
+                    Couleur recherchée: <strong style="color: {{ reference_item.color }};">{{ reference_item.color }}</strong> 
+                </p>
+                <img src="{{ url_for('static', filename=reference_item.image_path) }}" 
+                     alt="{{ reference_item.category }}" 
+                     style="max-width: 250px; height: 250px; object-fit: cover; border: 2px solid #333; border-radius: 5px;">
+            </section>
+
+            <hr>
+
+            <section>
+                <h2>Articles de la Même Couleur ({{ reference_item.color }})</h2>
+
+                {% if suggestions %}
+                    <div class="suggestions-list">
+                        {% for item in suggestions %}
+                            <div class="suggestion-card">
+                                <img src="{{ url_for('static', filename=item.image_path) }}" 
+                                     alt="{{ item.category }}">
+                                <p><strong>{{ item.category }}</strong></p>
+                                <p style="color: {{ item.color }};">Couleur: {{ item.color }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Aucun autre vêtement de la couleur {{ reference_item.color }} n'a été trouvé.</p>
+                {% endif %}
+            </section>
+
+            <p style="margin-top: 30px;"><a href="{{ url_for('wardrobe') }}">← Retour à la Garde-Robe</a></p>
+        </main>
+    </body>
+</html>

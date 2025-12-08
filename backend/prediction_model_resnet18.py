@@ -1,5 +1,6 @@
 from datetime import datetime
 from backend.predict_resnet18 import predict_single_image
+import random 
 CATEGORIES = [
     "T-shirt",
     "Chemise",
@@ -13,10 +14,21 @@ CATEGORIES = [
     "Chaussures"
 ]
 
+COLORS = [
+    "Blue",
+    "Red",
+    "Orange",
+    "Yellow",
+    "Green",
+    "Purple",
+    "Pink"
+]
+
 class Clothing:
-    def __init__(self, image_path, category = None):
+    def __init__(self, image_path, category = None, color=None):
         self.category = category
         self.image_path = image_path
+        self.color = color
     def __repr__(self):
         return f"{self.category}"
 
@@ -24,10 +36,16 @@ def detect_clothing(image_path):
     """
     function that takes an image as an input and returns the predicted type of cloth
     """
-    # Chose random category
     category = predict_single_image(image_path)
     return category
 
+def detect_color(image_path):
+    """
+    function that takes an image as an input and returns the predicted color
+    """
+    # Chose random color
+    category = random.choice(COLORS)
+    return category
 # ==========================
 # wardrobe storage
 # ==========================
