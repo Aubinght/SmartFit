@@ -7,12 +7,12 @@ from backend.database import db, Clothing, init_db_app
 
 app = Flask(__name__)
 
-# --- CONFIGURATION (AJOUTÉE) ---
+# --- CONFIGURATION ---
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///macollection.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# AJOUT CRUCIAL : Clé secrète pour sécuriser les sessions et permettre l'utilisation des messages flash.
-app.config['SECRET_KEY'] = 'ta_super_cle_secrete_ici_meme'
+# RÉINTÉGRATION CRUCIALE: Clé secrète pour sécuriser les sessions et permettre l'utilisation des messages flash.
+app.config['SECRET_KEY'] = 'ta_super_cle_secrete_ici_meme_et_unique' 
 
 # init database
 init_db_app(app) 
@@ -27,7 +27,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def homepage():
     return render_template('homepage.html')
 
-# Upload page (Étape 1 : Téléchargement et Détection)
+# Upload page (Étape 1 : Téléchargement et Détection - Prépare la confirmation)
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     # Lors d'un POST (téléchargement d'une image)
@@ -40,8 +40,7 @@ def upload():
             # 2. Détecter la catégorie
             category = detect_clothing(filepath)
             
-            # 3. ON N'ENREGISTRE PAS EN BASE ICI. 
-            # On renvoie les données pour la confirmation.
+            # 3. Confirmation systématique : on redirige vers le template de confirmation
             return render_template(
                 'upload.html',
                 predicted_category=category,
@@ -49,10 +48,11 @@ def upload():
                 show_confirmation=True # Indique au template d'afficher le formulaire de confirmation
             )
         else:
+            # Utilisation de flash pour les messages d'erreur
             flash("Veuillez sélectionner un fichier à télécharger.", "error")
             return redirect(url_for('upload'))
             
-    # Pour un GET ou après une erreur, on affiche le formulaire de base
+    # Pour un GET (premier accès) ou après une erreur, on affiche le formulaire de base
     return render_template('upload.html', show_confirmation=False)
 
 # Nouvelle Route de Confirmation (Étape 2 : Validation et Enregistrement)
@@ -63,7 +63,7 @@ def confirm_add():
     filepath = request.form.get('filepath')             # Le chemin de l'image
 
     if not final_category or not filepath:
-        flash("Erreur: Données de confirmation incomplètes.", "error")
+        flash("Erreur: Données de confirmation incomplètes. Veuillez réessayer.", "error")
         return redirect(url_for('upload'))
     
     # 2. SAUVEGARDE EN SQL
@@ -72,10 +72,12 @@ def confirm_add():
         db.session.add(new_item)
         db.session.commit()
         
+        # Utilisation de flash pour les messages de succès
         flash(f"Le vêtement '{final_category}' a été ajouté à la garde-robe!", "success")
         return redirect(url_for('wardrobe'))
 
     except Exception as e:
+        # Utilisation de flash pour les erreurs de base de données
         flash(f"Erreur lors de l'enregistrement en base de données: {e}", "error")
         return redirect(url_for('upload'))
 
