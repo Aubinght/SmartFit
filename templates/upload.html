@@ -1,20 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+    <meta charset="UTF-8">
     <title>Upload - SmartFit</title>
 </head>
 <body>
-    <h1>Upload a new clothing image</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="file" required>
-        <button type="submit">Upload</button>
-    </form>
-    {% if predicted_category and filepath%}
-        <h2>Detected category: {{ predicted_category }}</h2>
-        <img src="{{ url_for('static', filename=(filepath).replace('static/', '')) }}" 
-             alt="Uploaded image" width="300">
+
+    <h1>Ajouter un Vêtement à la Garde-Robe</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <hr>
+
+    {% if not show_confirmation %}
+        <h2>Étape 1 : Téléchargement</h2>
+        <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Télécharger et Détecter</button>
+        </form>
     {% endif %}
 
-    <a href="{{ url_for('wardrobe') }}">Go to wardrobe</a>
+    
+    {% if show_confirmation and filepath and predicted_category %}
+    <h2>Étape 2 : Confirmation de la Catégorie</h2>
+    
+    {% set img_filename = filepath.split('/')[-1] %}
+    <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" 
+         alt="Vêtement à confirmer" style="max-width: 200px;">
+    
+    <p>Le modèle a détecté : <strong>{{ predicted_category }}</strong>. Est-ce correct ?</p>
+    
+    <form method="POST" action="{{ url_for('confirm_add') }}">
+        
+        <input type="hidden" name="filepath" value="{{ filepath }}">
+
+        <label for="final_category">Catégorie finale :</label>
+        <select name="final_category" id="final_category" required>
+            {% for cat in categories %}
+                <option value="{{ cat }}" {% if cat|lower == predicted_category|lower %}selected{% endif %}>
+                    {{ cat }} {% if cat|lower == predicted_category|lower %}(Détectée){% endif %}
+                </option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Valider et Ajouter à la Garde-Robe</button>
+    </form>
+{% endif %}
+
+    <hr>
+    
+    <p><a href="{{ url_for('wardrobe') }}">Aller à la garde-robe</a></p>
+    <p><a href="{{ url_for('homepage') }}">Retour à l'accueil</a></p>
+
 </body>
 </html>
