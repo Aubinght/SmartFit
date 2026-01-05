@@ -6,7 +6,7 @@ from backend.database import db, Clothing, init_db_app
 from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color, CATEGORIES
 
 app = Flask(__name__)
-
+app.secret_key = 'secret_key'
 #configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///macollection.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -41,6 +41,7 @@ def homepage():
 #Upload page (step 1: upload, confirmation)
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
+    item_color = None
     #if POST (=upload of an image)
     if request.method == 'POST':
         file = request.files.get('file')
@@ -57,6 +58,7 @@ def upload():
                 'upload.html',
                 predicted_category=category,
                 filepath=filepath,
+                item_color=item_color,
                 show_confirmation=True, #display the confirmation form
                 categories=CATEGORIES #categories defined in backend
             )
@@ -66,7 +68,7 @@ def upload():
             return redirect(url_for('upload'))
             
     #For a GET (first access) ou after an error, display the form
-    return render_template('upload.html',item_color=item_color, show_confirmation=False)
+    return render_template('upload.html', show_confirmation=False)
 
 #Step 2: validation, save
 @app.route('/confirm_add', methods=['POST'])
