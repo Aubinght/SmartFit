@@ -25,19 +25,19 @@
             }
 
         nav ul {
-            list-style-type: none;  /* puces*/
+            list-style-type: none;  /* bullets */
             margin: 0; 
             padding: 0; 
-            display: flex;   /* Pour un menu horizontal */
+            display: flex;   /* horizontal menu */
             justify-content: center; 
         }
 
         nav li {
-            margin: 0 15px; /*espace entre chaque elt de la liste */
+            margin: 0 15px; /*space between each element of the list */
         }
 
         nav li a {
-            text-decoration: none; /* Soulignement*/
+            text-decoration: none; /*underlined*/
             color: #333; 
             font-weight: 600; 
             padding: 5px 10px;
@@ -59,13 +59,13 @@
             }
 
         .image-container {
-                width: 600px; /* Largeur fixe du cadre gris */
+                width: 600px; /* width of grey frame */
                 margin: 0 auto;
                 background-color: #e0e0e0;
                 padding: 10px;
                 border-radius: 5px;
-                overflow-x: auto; /* Active le défilement horizontal */
-                white-space: nowrap; /* Empêche les images de passer à la ligne */
+                overflow-x: auto; /* horizontal scrolling */
+                white-space: nowrap; /* keeps images from going to next line */
             }
 
         .image-container img {
@@ -73,7 +73,7 @@
                 height: 150px;
                 object-fit: cover;
                 margin-right: 10px;
-                display: inline-block; /* Permet aux images de s'aligner horizontalement */
+                display: inline-block; /* images align horizontally */
                 border-radius: 5px;
             }
         .clothesMenu {
@@ -120,10 +120,10 @@
             </nav>
         </div>
         
-         <!-- Menu horizontal --> 
+         <!-- horizontal menu --> 
          <!-- On mettra les liens des autres pages à la place des # -->
-        <nav> <!-- nav indique un lien cliquable -->
-            <ul> <!-- liste à points -->
+        <nav> <!-- clickable link -->
+            <ul> <!-- bullet list -->
                 <li><a href = "{{ url_for('wardrobe') }}">My wardrobe</a></li>
                 <li><a href = "#">Upload</a></li>
                 <li><a href = "#">Suggestions</a></li>
@@ -146,7 +146,7 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    <p style="white-space: normal;">Votre garde-robe est vide. 🧺 <a href="{{ url_for('upload') }}">Ajoutez un vêtement</a> !</p>
+                    <p style="white-space: normal;">Your wardrobe is empty 🧺 <a href="{{ url_for('upload') }}">Add clothes</a> !</p>
                 {% endif %}
 
             </div>

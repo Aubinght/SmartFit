@@ -6,7 +6,7 @@
 </head>
 <body>
 
-    <h1>Ajouter un Vêtement à la Garde-Robe</h1>
+    <h1>Add clothes to the wardrobe</h1>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -21,44 +21,44 @@
     <hr>
 
     {% if not show_confirmation %}
-        <h2>Étape 1 : Téléchargement</h2>
+        <h2>Step 1 : Upload</h2>
         <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
             <input type="file" name="file" required>
-            <button type="submit">Télécharger et Détecter</button>
+            <button type="submit">Upload and detect</button>
         </form>
     {% endif %}
 
     
     {% if show_confirmation and filepath and predicted_category %}
-    <h2>Étape 2 : Confirmation de la Catégorie</h2>
+    <h2>Step 2 : Confirm category</h2>
     
     {% set img_filename = filepath.split('/')[-1] %}
     <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" 
          alt="Vêtement à confirmer" style="max-width: 200px;">
     
-    <p>Le modèle a détecté : <strong>{{ predicted_category }}</strong>. Est-ce correct ?</p>
+    <p>The model detected : <strong>{{ predicted_category }}</strong>. Is it correct ?</p>
     
     <form method="POST" action="{{ url_for('confirm_add') }}">
         
         <input type="hidden" name="filepath" value="{{ filepath }}">
 
-        <label for="final_category">Catégorie finale :</label>
+        <label for="final_category">Final category :</label>
         <select name="final_category" id="final_category" required>
             {% for cat in categories %}
                 <option value="{{ cat }}" {% if cat|lower == predicted_category|lower %}selected{% endif %}>
-                    {{ cat }} {% if cat|lower == predicted_category|lower %}(Détectée){% endif %}
+                    {{ cat }} {% if cat|lower == predicted_category|lower %}(Detected){% endif %}
                 </option>
             {% endfor %}
         </select>
         
-        <button type="submit">Valider et Ajouter à la Garde-Robe</button>
+        <button type="submit">Confirm and add to the wardrobe</button>
     </form>
 {% endif %}
 
     <hr>
     
-    <p><a href="{{ url_for('wardrobe') }}">Aller à la garde-robe</a></p>
-    <p><a href="{{ url_for('homepage') }}">Retour à l'accueil</a></p>
+    <p><a href="{{ url_for('wardrobe') }}">Go to wardrobe</a></p>
+    <p><a href="{{ url_for('homepage') }}">Go to homepage</a></p>
 
 </body>
 </html>
