@@ -158,7 +158,7 @@
                             <img src="{{ url_for('static', filename=relative_path) }}" alt="{{ item.category }}">
                             <p>{{ item.category }} - {{ item.color }}</p>
                             <form action="{{ url_for('delete_item', item_id=item.id) }}" method="POST" onsubmit="return confirm('Delete this garment ?');">
-                                <button type="submit" class="delete-btn">Supprimer</button>
+                                <button type="submit" class="delete-btn">Delete</button>
                             </form>
                         </div>
                     {% endfor %}
