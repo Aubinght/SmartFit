@@ -4,40 +4,40 @@
     </head>
     
     <style>
+        /* --- Styles existants conservés --- */
         .header {
             background-color: #b7e9eb; 
             padding: 10px; 
             text-align: center; 
-            }
+        }
 
         .header h1 a {
             text-decoration: none;
-            font-size: 1em; /* Big title */
-            color: #000; /* Black text */
-            margin: 0; /* Remove default margin */
-
+            font-size: 1em;
+            color: #000;
+            margin: 0;
         }
         
         nav {
             background-color: #b7e9eb; 
             padding: 10px 0; 
             text-align: center; 
-            }
+        }
 
         nav ul {
-            list-style-type: none;  /* puces*/
+            list-style-type: none;
             margin: 0; 
             padding: 0; 
-            display: flex;   /* Pour un menu horizontal */
+            display: flex;
             justify-content: center; 
         }
 
         nav li {
-            margin: 0 15px; /*espace entre chaque elt de la liste */
+            margin: 0 15px;
         }
 
         nav li a {
-            text-decoration: none; /* Soulignement*/
+            text-decoration: none;
             color: #333; 
             font-weight: 600; 
             padding: 5px 10px;
@@ -48,69 +48,76 @@
         nav li a:hover {
             color: #628bb6; 
         }
+
         .gallery {
-                padding: 20px;
-                text-align: center;
-            }
+            padding: 20px;
+            text-align: center;
+        }
 
-            .gallery h2 {
-                font-size: 1.5em;
-                margin-bottom: 20px;
-            }
-
+        /* --- MODIFICATION ICI : Grille d'images --- */
         .image-container {
-                width: 600px; /* Largeur fixe du cadre gris */
-                margin: 0 auto;
-                background-color: #e0e0e0;
-                padding: 10px;
-                border-radius: 5px;
-                overflow-x: auto; /* Active le défilement horizontal */
-                white-space: nowrap; /* Empêche les images de passer à la ligne */
-            }
+            max-width: 1000px; /* On augmente la largeur max */
+            margin: 0 auto;
+            background-color: #f9f9f9; /* Un gris plus léger pour le fond */
+            padding: 20px;
+            border-radius: 5px;
+            
+            /* Utilisation de Flexbox pour la grille */
+            display: flex;
+            flex-wrap: wrap; /* Permet de passer à la ligne suivante */
+            justify-content: center; /* Centre les images horizontalement */
+            gap: 20px; /* Espace entre les cartes */
+        }
 
-        .image-container img {
-                width: 150px;
-                height: 150px;
-                object-fit: cover;
-                margin-right: 10px;
-                display: inline-block; /* Permet aux images de s'aligner horizontalement */
-                border-radius: 5px;
-            }
-        .clothesMenu {
-                padding: 20px;
-                text-align: center;
-            }
+        .item-card {
+            background: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        .clothesMenu h2 {
-                font-size: 1.5em;
-                margin-bottom: 20px;
-            }
+        .item-card img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            display: block;
+        }
 
-        .clothesMenu ul {
-                list-style-type: none;
-                padding: 0;
-            }
+        .item-card p {
+            margin: 10px 0 0 0;
+            font-weight: bold;
+            color: #555;
+            font-family: sans-serif;
+        }
 
-        .clothesMenu li {
-                margin: 10px 0;
-            }
-
-        .clothesMenu li a {
-                text-decoration: none;
-                color: #333;
-                font-weight: 600;
-                padding: 10px 20px;
-                background-color: #fff;
-                border: 2px solid #ccc;
-                border-radius: 25px;
-                display: inline-block;
-                width: 200px;
-            }
-
-        .clothesMenu li a:hover {
-                background-color: #e0e0e0;
-            }
-
+        /* Styles des filtres */
+        .filter-section a {
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .filter-section a:hover {
+            transform: scale(1.05);
+            background-color: #628bb6 !important;
+        }
+        
+        .delete-btn {
+            margin-top: 10px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .delete-btn:hover {
+            background-color: #fa5252;
+        }
     </style>
 
     <body> 
@@ -120,47 +127,45 @@
             </nav>
         </div>
         
-         <!-- Menu horizontal --> 
-         <!-- On mettra les liens des autres pages à la place des # -->
-        <nav> <!-- nav indique un lien cliquable -->
-            <ul> <!-- liste à points -->
+        <nav>
+            <ul>
                 <li><a href = "{{ url_for('wardrobe') }}">My wardrobe</a></li>
-                <li><a href = "#">Upload</a></li>
-                <li><a href = "#">Suggestions</a></li>
+                <li><a href = "{{ url_for('upload') }}">Upload</a></li>
+                <li><a href = "{{ url_for('recommendation') }}">Suggestions</a></li>
             </ul>
         </nav>
-    
+
          <div class="gallery">
             <h2>Your latest items</h2>
-            <div class="image-container">
+            
+            <div class="filter-section" style="margin: 20px; text-align: center;">
+                <h3>Filtrer par type :</h3>
+                <a href="{{ url_for('wardrobe') }}" style="margin: 5px; padding: 5px 10px; background: #eee; text-decoration: none; border-radius: 5px; color: #333;">Tout</a>
                 
+                {% for cat in categories %}
+                    <a href="{{ url_for('wardrobe', category=cat) }}" 
+                    style="margin: 5px; padding: 5px 10px; background: #86b9bb; color: white; text-decoration: none; border-radius: 5px;">
+                    {{ cat }}
+                    </a>
+                {% endfor %}
+            </div>
+
+            <div class="image-container">
                 {% if clothes %}
                     {% for item in clothes %}
                         {% set relative_path = item.image_path.replace('static/', '') %}
-                        
                         <div class="item-card">
-                            <img src="{{ url_for('static', filename=relative_path) }}" 
-                                 alt="{{ item.category }}">
-                            
-                            <p>{{ item.category }}</p>
+                            <img src="{{ url_for('static', filename=relative_path) }}" alt="{{ item.category }}">
+                            <p>{{ item.category }} - {{ item.color }}</p>
+                            <form action="{{ url_for('delete_item', item_id=item.id) }}" method="POST" onsubmit="return confirm('Delete this garment ?');">
+                                <button type="submit" class="delete-btn">Supprimer</button>
+                            </form>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <p style="white-space: normal;">Votre garde-robe est vide. 🧺 <a href="{{ url_for('upload') }}">Ajoutez un vêtement</a> !</p>
+                    <p>Votre garde-robe est vide. 🧺 <a href="{{ url_for('upload') }}">Ajoutez un vêtement</a> !</p>
                 {% endif %}
-
             </div>
-        </div>
-
-        <div class="clothesMenu">
-            <h2>Categories</h2>
-            <ul>
-                <li><a href="#">Tops</a></li>
-                <li><a href="#">Bottoms</a></li>
-                <li><a href="#">Accessories</a></li>
-                <li><a href="#">Footwear</a></li>
-            </ul>
         </div>
     </body>
 </html>
-

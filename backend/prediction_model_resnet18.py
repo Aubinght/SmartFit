@@ -1,6 +1,7 @@
 from datetime import datetime
 from backend.predict_resnet18 import predict_single_image
-import random 
+import random
+
 CATEGORIES = [
     "T-shirt",
     "Chemise",

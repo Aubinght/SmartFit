@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import os
 
 
 from backend.database import db, Clothing, init_db_app 
 from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color
 
-from backend.recommender import get_same_colors
+#from backend.recommender import get_same_colors
 
 app = Flask(__name__)
 
@@ -19,6 +19,22 @@ init_db_app(app)
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+@app.route('/delete/<int:item_id>', methods=['POST'])
+def delete_item(item_id):
+    item = Clothing.query.get_or_404(item_id)
+    try:
+        if os.path.exists(item.image_path):
+            os.remove(item.image_path)
+        db.session.delete(item)
+        db.session.commit()
+    except Exception as e:
+        print(f"Error during deletion : {e}")
+        db.session.rollback()
+
+    return redirect(url_for('wardrobe'))
+
 #homepage
 @app.route('/') 
 def homepage():
@@ -43,14 +59,32 @@ def upload():
 
 @app.route('/wardrobe')
 def wardrobe():
-    all_clothes = Clothing.query.all()
-    
-    return render_template('wardrobe.html', clothes=all_clothes)
+    selected_category = request.args.get('category')
+    if selected_category:
+        all_clothes = Clothing.query.filter_by(category=selected_category).all()
+    else:
+        all_clothes = Clothing.query.all()
+    #show only available categories
+    categories = db.session.query(Clothing.category).distinct().all()
+    categories = [c[0] for c in categories]
+    return render_template('wardrobe.html', clothes=all_clothes, categories=categories)
 
-@app.route('/recommendation/<color>')
-def recommendation(color):
-    recommended_clothes = get_same_colors(color)
-    return render_template('recommendation.html', recommendations=recommended_clothes)
-
+@app.route('/recommendation')
+@app.route('/recommendation/<int:item_id>')
+def recommendation(item_id=None):
+    if item_id:
+        reference_item = Clothing.query.get_or_404(item_id)
+        recommended_clothes = Clothing.query.filter(
+            Clothing.color == reference_item.color, 
+            Clothing.id != item_id
+        ).all()
+        return render_template('recommendation.html', 
+                               reference_item=reference_item, 
+                               suggestions=recommended_clothes)
+    else:
+        all_clothes = Clothing.query.all()
+        return render_template('recommendation.html', 
+                               reference_item=None, 
+                               all_clothes=all_clothes)
 if __name__ == '__main__':
     app.run(debug=True)
