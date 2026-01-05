@@ -79,11 +79,12 @@
         
          <!-- Horizontal menu --> 
          <!-- On mettra les liens des autres pages à la place des # -->
-        <nav> <!-- clickable link -->
-            <ul> <!-- bullet list -->
+
+        <nav>
+            <ul>
                 <li><a href = "{{ url_for('wardrobe') }}">My wardrobe</a></li>
                 <li><a href = "{{ url_for('upload') }}">Upload</a></li>
-                <li><a href = "#">Suggestions</a></li>
+                <li><a href = "{{ url_for('recommendation') }}">Suggestions</a></li>
             </ul>
         </nav>
         <div class="content">

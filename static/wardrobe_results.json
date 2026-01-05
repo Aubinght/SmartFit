@@ -6,5 +6,9 @@
     {
         "image": "static/uploads/cloth_1.jpg",
         "category": "Veste"
+    },
+    {
+        "image": "static/uploads/cloth_20251110_171257_713120.jpg",
+        "category": "T-shirt"
     }
 ]

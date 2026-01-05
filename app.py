@@ -2,9 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 
 #importation
-from backend.model import detect_clothing, save_image
 from backend.database import db, Clothing, init_db_app
-from backend.prediction_model_resnet18 import CATEGORIES
+from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color, CATEGORIES
 
 app = Flask(__name__)
 
@@ -19,6 +18,20 @@ init_db_app(app)
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/delete/<int:item_id>', methods=['POST'])
+def delete_item(item_id):
+    item = Clothing.query.get_or_404(item_id)
+    try:
+        if os.path.exists(item.image_path):
+            os.remove(item.image_path)
+        db.session.delete(item)
+        db.session.commit()
+    except Exception as e:
+        print(f"Error during deletion : {e}")
+        db.session.rollback()
+
+    return redirect(url_for('wardrobe'))
 
 #homepage
 @app.route('/') 
@@ -37,7 +50,8 @@ def upload():
             
             #detect the catégorie with imported function detect_clothing
             category = detect_clothing(filepath)
-            
+            item_color = detect_color(filepath)
+
             #systematic confirmation
             return render_template(
                 'upload.html',
@@ -52,7 +66,7 @@ def upload():
             return redirect(url_for('upload'))
             
     #For a GET (first access) ou after an error, display the form
-    return render_template('upload.html', show_confirmation=False)
+    return render_template('upload.html',item_color=item_color, show_confirmation=False)
 
 #Step 2: validation, save
 @app.route('/confirm_add', methods=['POST'])
@@ -60,6 +74,7 @@ def confirm_add():
     #get the confirmed data
     final_category = request.form.get('final_category') #category (possibly modified by user with confirmation form)
     filepath = request.form.get('filepath')
+    item_color = request.form.get('item_color')
 
     if not final_category or not filepath:
         flash("Error: Confirmation data incomplete. Please try again", "error")
@@ -67,7 +82,7 @@ def confirm_add():
     
     #save (sql)
     try:
-        new_item = Clothing(image_path=filepath, category=final_category)
+        new_item = Clothing(image_path=filepath, category=final_category, color=item_color)
         db.session.add(new_item)
         db.session.commit()
         
@@ -83,8 +98,33 @@ def confirm_add():
 
 @app.route('/wardrobe')
 def wardrobe():
-    all_clothes = Clothing.query.all()
-    return render_template('wardrobe.html', clothes=all_clothes)
+    selected_category = request.args.get('category')
+    if selected_category:
+        all_clothes = Clothing.query.filter_by(category=selected_category).all()
+    else:
+        all_clothes = Clothing.query.all()
+    #show only available categories
+    categories = db.session.query(Clothing.category).distinct().all()
+    categories = [c[0] for c in categories]
+    return render_template('wardrobe.html', clothes=all_clothes, categories=categories)
+
+@app.route('/recommendation')
+@app.route('/recommendation/<int:item_id>')
+def recommendation(item_id=None):
+    if item_id:
+        reference_item = Clothing.query.get_or_404(item_id)
+        recommended_clothes = Clothing.query.filter(
+            Clothing.color == reference_item.color, 
+            Clothing.id != item_id
+        ).all()
+        return render_template('recommendation.html', 
+                               reference_item=reference_item, 
+                               suggestions=recommended_clothes)
+    else:
+        all_clothes = Clothing.query.all()
+        return render_template('recommendation.html', 
+                               reference_item=None, 
+                               all_clothes=all_clothes)
 
 if __name__ == '__main__':
     app.run(debug=True)
