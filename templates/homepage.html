@@ -96,4 +96,13 @@
         width="500"  />
         </div>
     </body>
+
+    {% if current_user.is_authenticated %}
+        <p>Hello, {{ current_user.username }}!</p>
+        <a href="{{ url_for('wardrobe') }}">My Wardrobe</a> |
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">Login</a> |
+        <a href="{{ url_for('signup') }}">Sign Up</a>
+    {% endif %}
 </html>

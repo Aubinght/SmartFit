@@ -1,3 +1,48 @@
-<html> 
+<html>
+<head>
+    <title>SmartFit - Login</title>
+</head>
+<style>
+    .header { background-color: #b7e9eb; padding: 40px; text-align: center; }
+    .header h1 { font-size: 4em; color: #000; margin: 0; }
+    
+    nav { background-color: #b7e9eb; padding: 10px 0; text-align: center; }
+    nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; }
+    nav li { margin: 0 15px; }
+    nav li a { text-decoration: none; color: #333; font-weight: 600; padding: 5px 10px; background-color: #86b9bb; border-radius: 3px; }
+    
+    .content { padding: 40px; max-width: 600px; margin: 0 auto; text-align: center; }
+    
+    /* Style for the form boxes */
+    input { padding: 10px; margin: 10px; border-radius: 5px; border: 1px solid #86b9bb; width: 80%; }
+    button { padding: 10px 20px; background-color: #86b9bb; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+</style>
+<body>
+    <div class="header">
+        <h1>SMART FIT</h1>
+    </div>
 
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('homepage') }}">Home</a></li>
+            <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        <h2>Login</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <p style="color: red;">{{ messages[0] }}</p>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required><br>
+            <input type="password" name="password" placeholder="Password" required><br>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
 </html>

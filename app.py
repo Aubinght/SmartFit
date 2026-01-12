@@ -15,7 +15,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #init database
 init_db_app(app) 
 
-#Trucs pour profil utilisateur
+#The login manager permits to keep track of who is logged in 
+# as they click through different pages
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -24,7 +25,25 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+#signup
+# Takes an username and password, hashes the password
+# and save the new user to "mycollection.db"
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = generate_password_hash(request.form['password'])
+        new_user = User(username=username, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created! Please log in.')
+        return redirect(url_for('login'))
+    return render_template('signup.html')
+
+
 #login
+# Checks if the username exists and if the hashed password matches what was typed
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -44,20 +63,6 @@ def logout():
     logout_user()
     return redirect(url_for('homepage'))
 
-#signup
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = generate_password_hash(request.form['password'])
-        new_user = User(username=username, password=password)
-        db.session.add(new_user)
-        db.session.commit()
-        flash('Account created! Please log in.')
-        return redirect(url_for('login'))
-    return render_template('signup.html')
-
-
 # dossier de sauvegarde des images uploadées
 UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -68,6 +73,9 @@ def homepage():
     return render_template('homepage.html')
 
 #Upload page
+# Receive the image file
+# Uses our model "detect_clothing" to guess what it is
+# Saves the image and the guess into the database, linked to the current user
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
@@ -78,12 +86,14 @@ def upload():
         if file :
             filepath = save_image(file)
             category = detect_clothing(filepath)
-            new_item = Clothing(image_path=filepath, category=category)
+            new_item = Clothing(image_path=filepath, category=category, user_id=current_user.id)
             db.session.add(new_item)
             db.session.commit()
         
     return render_template('upload.html',predicted_category=category, filepath=filepath)
 
+# Closet 
+# Displays all the clothes where "user_id" matches the user who is logged in
 @app.route('/wardrobe')
 @login_required
 def wardrobe():
