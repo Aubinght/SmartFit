@@ -1,0 +1,172 @@
+<html>
+    <head>  
+        <title>Suggestions - SmartFit</title>
+        <style>
+            .header {
+                background-color: #b7e9eb; 
+                padding: 10px; 
+                text-align: center; 
+                }
+
+            .header h1 a {
+                text-decoration: none;
+                font-size: 1em; 
+                color: #000; 
+                margin: 0; 
+            }
+            
+            nav {
+                background-color: #b7e9eb; 
+                padding: 10px 0; 
+                text-align: center; 
+                }
+
+            nav ul {
+                list-style-type: none;
+                margin: 0; 
+                padding: 0; 
+                display: flex;
+                justify-content: center; 
+            }
+
+            nav li {
+                margin: 0 15px;
+            }
+
+            nav li a {
+                text-decoration: none;
+                color: #333; 
+                font-weight: 600; 
+                padding: 5px 10px;
+                background-color: #86b9bb;
+                border-radius: 3px;
+            }
+
+            nav li a:hover {
+                color: #628bb6; 
+            }
+
+            .gallery {
+                padding: 20px;
+                text-align: center;
+            }
+
+            .suggestions-list {
+                display: flex;
+                flex-wrap: wrap; 
+                justify-content: center;
+                gap: 20px; 
+                padding: 20px;
+            }
+
+            .suggestion-card {
+                border: 1px solid #ccc;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 180px; 
+                box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+                border-radius: 5px;
+            }
+
+            .suggestion-card img {
+                width: 150px;
+                height: 150px;
+                object-fit: cover;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+
+            .reference-item img {
+                object-fit: cover;
+            }
+            .suggestion-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+            }
+        </style>
+    </head>
+    
+    <body>
+        <header class="header">
+            <h1><a href="{{ url_for('homepage') }}">SmartFit</a></h1>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href = "{{ url_for('wardrobe') }}">My wardrobe</a></li>
+                <li><a href = "{{ url_for('upload') }}">Upload</a></li>
+                <li><a href = "{{ url_for('recommendation') }}">Suggestions</a></li>
+            </ul>
+        </nav>
+
+        <hr>
+
+        <main style="text-align: center; padding: 20px;">
+            
+            {% if reference_item %}
+                <h1>Suggestions for this item</h1>
+
+                <section class="reference-item">
+                    <h2>Reference Item</h2>
+                    <p>
+                        Category: <strong>{{ reference_item.category }}</strong> | 
+                        Color: <strong style="color: {{ reference_item.color }};">{{ reference_item.color }}</strong> 
+                    </p>
+                    {% set relative_path = reference_item.image_path.replace('static/', '') %}
+                    <img src="{{ url_for('static', filename=relative_path) }}" 
+                         alt="{{ reference_item.category }}" 
+                         style="max-width: 250px; height: 250px; border: 3px solid #75999a; border-radius: 10px;">
+                    <p style="margin-top: 15px;">
+                        <a href="{{ url_for('recommendation') }}" style="color: #628bb6; text-decoration: none; font-weight: bold;">
+                            ✕ Choose another garment 
+                        </a>
+                    </p>
+                </section>
+
+                <hr>
+
+                <section>
+                    <h2>Matching items ({{ reference_item.color }})</h2>
+
+                    {% if suggestions %}
+                        <div class="suggestions-list">
+                            {% for item in suggestions %}
+                                <div class="suggestion-card">
+                                    {% set relative_path = item.image_path.replace('static/', '') %}
+                                    <img src="{{ url_for('static', filename=relative_path) }}" 
+                                         alt="{{ item.category }}">
+                                    <p><strong>{{ item.category }}</strong></p>
+                                    <p style="color: {{ item.color }};">Couleur: {{ item.color }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No other garment has been found.</p>
+                    {% endif %}
+                </section>
+
+            {% else %}
+                <h1>Chose a garment to get suggestions !</h1>
+                <div class="suggestions-list">
+                    {% for item in all_clothes %}
+                        <div class="suggestion-card" style="cursor: pointer;">
+                            <a href="{{ url_for('recommendation', item_id=item.id) }}" style="text-decoration: none; color: inherit;">
+                                {% set relative_path = item.image_path.replace('static/', '') %}
+                                <img src="{{ url_for('static', filename=relative_path) }}">
+                                <p><strong>{{ item.category }}</strong></p>
+                                <p>Color: {{ item.color }}</p>
+                                <span style="background-color: #86b9bb; color: white; padding: 4px 10px; border-radius: 3px; font-size: 0.9em; display: inline-block; margin-top: 5px;">
+                                    Select
+                                </span>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <p style="margin-top: 40px;"><a href="{{ url_for('wardrobe') }}" style="text-decoration: none; color: #333;">← Retour à la Garde-Robe</a></p>
+        </main>
+    </body>
+</html>
