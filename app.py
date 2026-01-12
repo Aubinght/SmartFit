@@ -35,6 +35,10 @@ def load_user(user_id):
 def signup():
     if request.method == 'POST':
         username = request.form['username']
+        user_exists = User.query.filter_by(username=username).first()
+        if user_exists:
+            flash('username already taken')
+            return redirect(url_for('login'))
         password = generate_password_hash(request.form['password'])
         new_user = User(username=username, password=password)
         db.session.add(new_user)
