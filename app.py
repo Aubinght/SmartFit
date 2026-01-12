@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import os
 import random
 from backend.database import db, Clothing, init_db_app, User
-from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color, CATEGORIES
+from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color, CATEGORIES, COLORS
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
@@ -107,12 +107,11 @@ def upload():
     if request.method == 'POST':
         file = request.files.get('file')
         if file and file.filename != '':
-            #save the image
             filepath = save_image(file)
-            
-            #detect the catégorie with imported function detect_clothing
-            category = detect_clothing(filepath)[0][0]
-            new_item = Clothing(image_path=filepath, category=category, user_id=current_user.id)
+            #detect the catégorie with function detect_clothing
+            category = detect_clothing(filepath)
+            if isinstance(category, list):
+                category = category[0][0]
             item_color = detect_color(filepath)
 
             #systematic confirmation
@@ -120,9 +119,10 @@ def upload():
                 'upload.html',
                 predicted_category=category,
                 filepath=filepath,
-                item_color=item_color,
+                predicted_color=item_color,
                 show_confirmation=True, #display the confirmation form
-                categories=CATEGORIES #categories defined in backend
+                categories=CATEGORIES,
+                colors = COLORS
             )
         else:
             #error messages if no file uploaded
@@ -138,7 +138,7 @@ def confirm_add():
     #get the confirmed data
     final_category = request.form.get('final_category') #category (possibly modified by user with confirmation form)
     filepath = request.form.get('filepath')
-    item_color = request.form.get('item_color')
+    item_color = request.form.get('final_color')
 
     if not final_category or not filepath:
         flash("Error: Confirmation data incomplete. Please try again", "error")
@@ -165,12 +165,11 @@ def confirm_add():
 @app.route('/wardrobe')
 @login_required
 def wardrobe():
-    user_clothes = Clothing.query.filter_by(user_id=current_user.id)
     selected_category = request.args.get('category')
     if selected_category:
         all_clothes = Clothing.query.filter_by(user_id=current_user.id, category=selected_category).all()
     else:
-        all_clothes = user_clothes
+        all_clothes = Clothing.query.filter_by(user_id=current_user.id).all()
     #show only available categories
     categories = db.session.query(Clothing.category).distinct().all()
     categories = [c[0] for c in categories]

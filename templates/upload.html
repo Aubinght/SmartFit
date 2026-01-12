@@ -120,11 +120,9 @@
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul>
         {% for message in messages %}
           <li>{{ message }}</li>
         {% endfor %}
-        </ul>
       {% endif %}
     {% endwith %}
 
@@ -146,7 +144,7 @@
     <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" 
          alt="Garment to confirm" style="max-width: 200px;">
     
-    <p>Color detected: <strong style="color: {{ item_color }};">{{ item_color }}</strong></p>
+    <p>Color detected: <strong style="color: {{ predicted_color }};">{{ predicted_color }}</strong></p>
     <p>The model detected : <strong>{{ predicted_category }}</strong>. Is it correct ?</p>
     
     <form method="POST" action="{{ url_for('confirm_add') }}">
@@ -162,7 +160,16 @@
                 </option>
             {% endfor %}
         </select>
-        
+        <br>
+        <label for="final_color">Correct color :</label>
+        <select name="final_color" id="final_color" required>
+            {% for col in colors %}
+                <option value="{{ col }}" {% if col|lower == predicted_color|lower %}selected{% endif %}>
+                    {{ col }} {% if col|lower == predicted_color|lower %}(Detected){% endif %}
+                </option>
+            {% endfor %}
+        </select>
+        <br><br>
         <button type="submit">Confirm and add to the wardrobe</button>
     </form>
 {% endif %}
