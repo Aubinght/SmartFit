@@ -144,7 +144,7 @@
     
     {% set img_filename = filepath.split('/')[-1] %}
     <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" 
-         alt="Vêtement à confirmer" style="max-width: 200px;">
+         alt="Garment to confirm" style="max-width: 200px;">
     
     <p>Color detected: <strong style="color: {{ item_color }};">{{ item_color }}</strong></p>
     <p>The model detected : <strong>{{ predicted_category }}</strong>. Is it correct ?</p>

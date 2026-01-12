@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import os
-
+import random
 from backend.database import db, Clothing, init_db_app, User
 from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color, CATEGORIES
 
@@ -182,10 +182,18 @@ def wardrobe():
 def recommendation(item_id=None):
     if item_id:
         reference_item = Clothing.query.get_or_404(item_id)
-        recommended_clothes = Clothing.query.filter(
+        potential_suggestions = Clothing.query.filter(
             Clothing.color == reference_item.color, 
             Clothing.id != item_id
         ).all()
+        random.shuffle(potential_suggestions)
+        unique_suggestions_dict = {}
+        for item in potential_suggestions:
+            if item.category not in unique_suggestions_dict :
+                if item.category != reference_item.category:
+                    unique_suggestions_dict[item.category] = item
+        recommended_clothes = list(unique_suggestions_dict.values())
+
         return render_template('recommendation.html', 
                                reference_item=reference_item, 
                                suggestions=recommended_clothes)
