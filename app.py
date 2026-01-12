@@ -111,10 +111,8 @@ def upload():
             filepath = save_image(file)
             
             #detect the catégorie with imported function detect_clothing
-            category = detect_clothing(filepath)
+            category = detect_clothing(filepath)[0][0]
             new_item = Clothing(image_path=filepath, category=category, user_id=current_user.id)
-            db.session.add(new_item)
-            db.session.commit()
             item_color = detect_color(filepath)
 
             #systematic confirmation
@@ -148,7 +146,7 @@ def confirm_add():
     
     #save (sql)
     try:
-        new_item = Clothing(image_path=filepath, category=final_category, color=item_color)
+        new_item = Clothing(image_path=filepath, category=final_category, color=item_color, user_id=current_user.id)
         db.session.add(new_item)
         db.session.commit()
         
@@ -167,14 +165,12 @@ def confirm_add():
 @app.route('/wardrobe')
 @login_required
 def wardrobe():
-    user_clothes = Clothing.query.filter_by(user_id=current_user.id).all()
-    return render_template('wardrobe.html', clothes=user_clothes)
-    
+    user_clothes = Clothing.query.filter_by(user_id=current_user.id)
     selected_category = request.args.get('category')
     if selected_category:
-        all_clothes = Clothing.query.filter_by(category=selected_category).all()
+        all_clothes = Clothing.query.filter_by(user_id=current_user.id, category=selected_category).all()
     else:
-        all_clothes = Clothing.query.all()
+        all_clothes = user_clothes
     #show only available categories
     categories = db.session.query(Clothing.category).distinct().all()
     categories = [c[0] for c in categories]
@@ -182,6 +178,7 @@ def wardrobe():
 
 @app.route('/recommendation')
 @app.route('/recommendation/<int:item_id>')
+@login_required
 def recommendation(item_id=None):
     if item_id:
         reference_item = Clothing.query.get_or_404(item_id)
