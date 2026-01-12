@@ -12,7 +12,8 @@ CATEGORIES = [
     "Robe",
     "Veste",
     "Manteau",
-    "Chaussures"
+    "Chaussures",
+    "Chapeau"
 ]
 
 COLORS = [
