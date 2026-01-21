@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Suggestions - SmartFit</title>
     <style>
+        /* --- Styles globaux identiques à Upload --- */
         .header {
             background-color: #b7e9eb; 
             padding: 10px; 
@@ -47,11 +48,11 @@
         main {
             text-align: center;
             padding: 40px;
-            max-width: 1000px; /* On garde large pour la silhouette */
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        /* --- STYLES DES JOLIES CARDS (RE-TRAVAILLÉS) --- */
+        /* --- STYLES DES JOLIES CARDS --- */
         .outfit-builder { 
             display: flex; 
             flex-direction: column; 
@@ -68,7 +69,7 @@
             background-color: #f9f9f9;
             border-radius: 10px;
             border: 1px solid #ddd;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Ombre de la upload-container */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .suggestion-card {
@@ -77,7 +78,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 180px; /* Taille d'origine des jolies cards */
+            width: 170px; /* Légèrement ajusté pour le visuel sans texte */
             background-color: #fff;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
             border-radius: 5px;
@@ -89,7 +90,6 @@
             height: 150px;
             object-fit: cover;
             border-radius: 5px;
-            margin-bottom: 10px;
         }
 
         .suggestion-card:hover {
@@ -101,6 +101,7 @@
             border: 3px solid #86b9bb;
             background-color: #e0f2f1;
         }
+
         .empty-msg {
             color: #999;
             font-size: 0.9em;
@@ -151,13 +152,11 @@
                         {% if reference_item.category == 'Chapeau' %}
                             <div class="suggestion-card reference">
                                 <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ reference_item.category }}</strong></p>
                             </div>
                         {% endif %}
                         {% for item in head_list %}
                             <div class="suggestion-card">
                                 <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ item.category }}</strong></p>
                             </div>
                         {% endfor %}
                     {% else %}
@@ -172,13 +171,11 @@
                         {% if reference_item.category in top_cats %}
                             <div class="suggestion-card reference">
                                 <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ reference_item.category }}</strong></p>
                             </div>
                         {% endif %}
                         {% for item in top_list %}
                             <div class="suggestion-card">
                                 <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ item.category }}</strong></p>
                             </div>
                         {% endfor %}
                     {% else %}
@@ -193,13 +190,11 @@
                         {% if reference_item.category in bottom_cats %}
                             <div class="suggestion-card reference">
                                 <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ reference_item.category }}</strong></p>
                             </div>
                         {% endif %}
                         {% for item in bottom_list %}
                             <div class="suggestion-card">
                                 <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ item.category }}</strong></p>
                             </div>
                         {% endfor %}
                     {% else %}
@@ -213,13 +208,11 @@
                         {% if reference_item.category == 'Chaussures' %}
                             <div class="suggestion-card reference">
                                 <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ reference_item.category }}</strong></p>
                             </div>
                         {% endif %}
                         {% for item in feet_list %}
                             <div class="suggestion-card">
                                 <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                                <p><strong>{{ item.category }}</strong></p>
                             </div>
                         {% endfor %}
                     {% else %}
@@ -237,8 +230,8 @@
                     <div class="suggestion-card">
                         <a href="{{ url_for('recommendation', item_id=item.id) }}" style="text-decoration:none; color:inherit;">
                             <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                            <p><strong>{{ item.category }}</strong></p>
-                            <button class="btn-select" style="margin-top:10px;">Select</button>
+                            <p style="margin-bottom: 10px;"><strong>{{ item.category }}</strong></p>
+                            <button class="btn-select">Select</button>
                         </a>
                     </div>
                 {% endfor %}
