@@ -62,3 +62,7 @@ def evaluate():
 
 if __name__ == "__main__":
     evaluate()
+#----- Results on the last english model
+'''
+ Accuracy : 79.03%
+'''
