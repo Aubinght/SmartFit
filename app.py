@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import os
 import random
 from backend.database import db, Clothing, init_db_app, User
-from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color, CATEGORIES, COLORS
+from backend.detect_eng import detect_clothing, save_image, detect_color, CATEGORIES, COLORS
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
