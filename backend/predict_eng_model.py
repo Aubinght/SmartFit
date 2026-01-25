@@ -5,7 +5,7 @@ import os
 
 # Parameters
 IMG_PATH = "static/uploads/cloth_20251110_171257_713120.jpg"
-MODEL_PATH = "backend/finetuned_model_eng.pth"
+MODEL_PATH = "backend/finetuned_model_eng_compressed_images_freed_layer_4.pth"
 CLASSES_PATH = "backend/classes_eng.txt"
 
 def predict_single_image(img_path,model_path = MODEL_PATH, classes_path = CLASSES_PATH):
@@ -16,7 +16,10 @@ def predict_single_image(img_path,model_path = MODEL_PATH, classes_path = CLASSE
     # Load model
     device = torch.device("cpu") # enough for one image
     model = models.resnet18(weights=None)
-    model.fc = torch.nn.Linear(model.fc.in_features, len(class_names))
+    model.fc = torch.nn.Sequential(
+    torch.nn.Dropout(0.3),
+    torch.nn.Linear(model.fc.in_features, len(class_names))
+    )
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 

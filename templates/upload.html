@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-    /* Styles spécifiques à l'Upload uniquement */
+    /* --- Styles spécifiques à l'Upload uniquement --- */
     .upload-container {
         background-color: #f9f9f9;
         padding: 30px;
@@ -27,8 +27,14 @@
         padding: 10px;
         margin-bottom: 20px;
         border-radius: 5px;
-        background-color: #d4edda;
-        color: #155724;
+    }
+    .flash-error { 
+        background-color: #f8d7da; 
+        color: #721c24; 
+    }
+    .flash-success { 
+        background-color: #d4edda; 
+        color: #155724; 
     }
 
     select {
@@ -40,51 +46,64 @@
         max-width: 300px;
     }
 
-    .step-title { color: #2c3e50; margin-bottom: 20px; }
+    .step-title { 
+        color: #2c3e50; 
+        margin-bottom: 20px; 
+    }
+
+    button {
+        background-color: #86b9bb;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover { 
+        background-color: #628bb6; 
+    }
 </style>
 
 <div class="upload-section">
     <h1>Add clothes to your wardrobe</h1>
 
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        <div class="flash-messages">
-          {% for message in messages %}
+        {% for category, message in messages %}
+          <ul class="flash-messages flash-{{ category }}">
             <li>{{ message }}</li>
-          {% endfor %}
-        </div>
+          </ul>
+        {% endfor %}
       {% endif %}
     {% endwith %}
 
     <div class="upload-container">
         {% if not show_confirmation %}
-            <h2 class="step-title">Step 1: Upload your item</h2>
+            <h2 class="step-title">Step 1 : Upload your item</h2>
             <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">            
-                <input type="file" name="file" required style="border: none; background: transparent;">
+                <input type="file" name="file" required>
                 <br><br>
                 <button type="submit">Upload and analyze</button>
             </form>
         {% endif %}
 
         {% if show_confirmation and filepath and predicted_category %}
-            <h2 class="step-title">Step 2: Confirm category & color</h2>
+            <h2 class="step-title">Step 2 : Confirm category</h2>
             
             {% set img_filename = filepath.split('/')[-1] %}
             <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" 
                  alt="Garment to confirm" class="preview-img">
             
-            <p>Color detected: 
-                <strong style="color: {{ predicted_color | default('black') }}; text-shadow: 0px 0px 2px #000;">
-                    {{ predicted_color | default('Unknown') }}
-                </strong>
-            </p>
-            <p>The model detected: <strong>{{ predicted_category }}</strong>. Is it correct?</p>
+            <p>Color detected: <strong style="color: {{ predicted_color }};">{{ predicted_color }}</strong></p>
+            <p>The model detected : <strong>{{ predicted_category }}</strong>. Is it correct ?</p>
             
             <form method="POST" action="{{ url_for('confirm_add') }}">
                 <input type="hidden" name="filepath" value="{{ filepath }}">
                 <input type="hidden" name="item_color" value="{{ item_color }}">
                 
-                <label for="final_category">Final category:</label><br>
+                <label for="final_category">Final category :</label><br>
                 <select name="final_category" id="final_category" required>
                     {% for cat in categories %}
                         <option value="{{ cat }}" {% if cat|lower == predicted_category|lower %}selected{% endif %}>
@@ -93,10 +112,10 @@
                     {% endfor %}
                 </select>
                 <br>
-                <label for="final_color">Correct color:</label><br>
+                <label for="final_color">Correct color :</label><br>
                 <select name="final_color" id="final_color" required>
                     {% for col in colors %}
-                        <option value="{{ col }}" {% if col|lower == predicted_color|lower %}selected{% endif %}>
+                        <option value="{{ col }}" {% if col|lower == predicted_category|lower %}selected{% endif %}>
                             {{ col }} {% if col|lower == predicted_color|lower %}(Detected){% endif %}
                         </option>
                     {% endfor %}

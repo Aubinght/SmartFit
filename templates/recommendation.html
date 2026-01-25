@@ -1,242 +1,198 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Suggestions - SmartFit</title>
-    <style>
-        /* --- Styles globaux identiques à Upload --- */
-        .header {
-            background-color: #b7e9eb; 
-            padding: 10px; 
-            text-align: center; 
-        }
+{% extends "template.html" %}
 
-        .header h1 a {
-            text-decoration: none;
-            font-size: 1em;
-            color: #000;
-            margin: 0;
-        }
+{% block title %}Suggestions - SmartFit{% endblock %}
+
+{% block content %}
+<style>
+    /* --- Styles spécifiques à Suggestions (design cohérent avec Upload) --- */
+    .outfit-builder { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        gap: 20px; 
+    }
+
+    .outfit-row {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .suggestion-card {
+        border: 1px solid #ccc;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 170px;
+        background-color: #fff;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        border-radius: 5px;
+        transition: 0.3s;
+    }
+
+    .suggestion-card img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .suggestion-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .suggestion-card.reference {
+        border: 3px solid #86b9bb;
+        background-color: #e0f2f1;
+    }
+
+    .empty-msg {
+        color: #999;
+        font-size: 0.9em;
+        font-style: italic;
+        align-self: center;
+    }
+
+    button, .btn-select {
+        background-color: #86b9bb;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 5px;
+    }
+    button:hover, .btn-select:hover { 
+        background-color: #628bb6; 
+    }
+
+    .clothes-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    h1 {
+        font-weight: normal;
+        margin-bottom: 30px;
+    }
+
+    .change-link {
+        color: #628bb6;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 40px;
+        display: inline-block;
+    }
+</style>
+
+<main>
+    {% if reference_item %}
+        <h1>Your Outfit ({{ reference_item.color }})</h1>
         
-        nav {
-            background-color: #b7e9eb; 
-            padding: 10px 0; 
-            text-align: center; 
-        }
-
-        nav ul {
-            list-style-type: none;
-            margin: 0; 
-            padding: 0; 
-            display: flex;
-            justify-content: center; 
-        }
-
-        nav li { margin: 0 15px; }
-
-        nav li a {
-            text-decoration: none;
-            color: #333; 
-            font-weight: 600; 
-            padding: 5px 10px;
-            background-color: #86b9bb;
-            border-radius: 3px;
-        }
-
-        nav li a:hover { color: #628bb6; }
-
-        main {
-            text-align: center;
-            padding: 40px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        /* --- STYLES DES JOLIES CARDS --- */
-        .outfit-builder { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 20px; 
-        }
-
-        .outfit-row {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .suggestion-card {
-            border: 1px solid #ccc;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 170px; /* Légèrement ajusté pour le visuel sans texte */
-            background-color: #fff;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-
-        .suggestion-card img {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-
-        .suggestion-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .suggestion-card.reference {
-            border: 3px solid #86b9bb;
-            background-color: #e0f2f1;
-        }
-
-        .empty-msg {
-            color: #999;
-            font-size: 0.9em;
-            font-style: italic;
-            align-self: center;
-        }
-
-        button, .btn-select {
-            background-color: #86b9bb;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover { background-color: #628bb6; }
-
-        h1 {
-            font-family: inherit;
-            font-weight: normal;
-            margin-bottom: 30px;
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <h1><a href="{{ url_for('homepage') }}">SMART FIT</a></h1>
-    </header>
-
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('wardrobe') }}">My wardrobe</a></li>
-            <li><a href="{{ url_for('upload') }}">Upload</a></li>
-            <li><a href="{{ url_for('recommendation') }}">Suggestions</a></li>
-        </ul>
-    </nav>
-
-    <main>
-        {% if reference_item %}
-            <h1>Your Outfit ({{ reference_item.color }})</h1>
-            
-            <div class="outfit-builder">
-                <div class="outfit-row head-row" style="width: 60%; border-style: dashed;">
-                    {% set head_list = suggestions | selectattr("category", "equalto", "Hat") | list %}
-                    {% if reference_item.category == 'Chapeau' or head_list %}
-                        {% if reference_item.category == 'Chapeau' %}
-                            <div class="suggestion-card reference">
-                                <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endif %}
-                        {% for item in head_list %}
-                            <div class="suggestion-card">
-                                <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <span class="empty-msg">No hat found in your wardrobe</span>
+        <div class="outfit-builder">
+            <div class="outfit-row head-row" style="width: 60%; border-style: dashed;">
+                {% set head_list = suggestions | selectattr("category", "equalto", "Hat") | list %}
+                {% if reference_item.category == 'Chapeau' or head_list %}
+                    {% if reference_item.category == 'Chapeau' %}
+                        <div class="suggestion-card reference">
+                            <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
+                        </div>
                     {% endif %}
-                </div>
-
-                <div class="outfit-row top-row">
-                    {% set top_cats = ['T-shirt', 'Longsleeve','Hoodie', 'Outwear', 'Blazer', 'Shirt','Dress'] %}
-                    {% set top_list = suggestions | selectattr("category", "in", top_cats) | list %}
-                    {% if reference_item.category in top_cats or top_list %}
-                        {% if reference_item.category in top_cats %}
-                            <div class="suggestion-card reference">
-                                <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endif %}
-                        {% for item in top_list %}
-                            <div class="suggestion-card">
-                                <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <span class="empty-msg">No top found in your wardrobe</span>
-                    {% endif %}
-                </div>
-
-                <div class="outfit-row bottom-row">
-                    {% set bottom_cats = ['Pants', 'Jean', 'Skirt'] %}
-                    {% set bottom_list = suggestions | selectattr("category", "in", bottom_cats) | list %}
-                    {% if reference_item.category in bottom_cats or bottom_list %}
-                        {% if reference_item.category in bottom_cats %}
-                            <div class="suggestion-card reference">
-                                <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endif %}
-                        {% for item in bottom_list %}
-                            <div class="suggestion-card">
-                                <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <span class="empty-msg">No bottoms found in your wardrobe</span>
-                    {% endif %}
-                </div>
-
-                <div class="outfit-row feet-row" style="width: 70%; border-style: dashed;">
-                    {% set feet_list = suggestions | selectattr("category", "equalto", "Shoes") | list %}
-                    {% if reference_item.category == 'Chaussures' or feet_list %}
-                        {% if reference_item.category == 'Chaussures' %}
-                            <div class="suggestion-card reference">
-                                <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endif %}
-                        {% for item in feet_list %}
-                            <div class="suggestion-card">
-                                <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <span class="empty-msg">No shoes found in your wardrobe</span>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <p style="margin-top:40px"><a href="{{ url_for('recommendation') }}" style="color:#628bb6; text-decoration:none; font-weight:bold;">✕ Change item</a></p>
-
-        {% else %}
-            <h1>Choose a base item</h1>
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:20px;">
-                {% for item in all_clothes %}
-                    <div class="suggestion-card">
-                        <a href="{{ url_for('recommendation', item_id=item.id) }}" style="text-decoration:none; color:inherit;">
+                    {% for item in head_list %}
+                        <div class="suggestion-card">
                             <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
-                            <p style="margin-bottom: 10px;"><strong>{{ item.category }}</strong></p>
-                            <button class="btn-select">Select</button>
-                        </a>
-                    </div>
-                {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <span class="empty-msg">No hat found in your wardrobe</span>
+                {% endif %}
             </div>
-        {% endif %}
-    </main>
-</body>
-</html>
+
+            <div class="outfit-row top-row">
+                {% set top_cats = ['T-shirt', 'Longsleeve','Hoodie', 'Outwear', 'Blazer', 'Shirt','Dress'] %}
+                {% set top_list = suggestions | selectattr("category", "in", top_cats) | list %}
+                {% if reference_item.category in top_cats or top_list %}
+                    {% if reference_item.category in top_cats %}
+                        <div class="suggestion-card reference">
+                            <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
+                        </div>
+                    {% endif %}
+                    {% for item in top_list %}
+                        <div class="suggestion-card">
+                            <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <span class="empty-msg">No top found in your wardrobe</span>
+                {% endif %}
+            </div>
+
+            <div class="outfit-row bottom-row">
+                {% set bottom_cats = ['Pants', 'Jean', 'Skirt'] %}
+                {% set bottom_list = suggestions | selectattr("category", "in", bottom_cats) | list %}
+                {% if reference_item.category in bottom_cats or bottom_list %}
+                    {% if reference_item.category in bottom_cats %}
+                        <div class="suggestion-card reference">
+                            <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
+                        </div>
+                    {% endif %}
+                    {% for item in bottom_list %}
+                        <div class="suggestion-card">
+                            <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <span class="empty-msg">No bottoms found in your wardrobe</span>
+                {% endif %}
+            </div>
+
+            <div class="outfit-row feet-row" style="width: 70%; border-style: dashed;">
+                {% set feet_list = suggestions | selectattr("category", "equalto", "Shoes") | list %}
+                {% if reference_item.category == 'Chaussures' or feet_list %}
+                    {% if reference_item.category == 'Chaussures' %}
+                        <div class="suggestion-card reference">
+                            <img src="{{ url_for('static', filename=reference_item.image_path.replace('static/', '')) }}">
+                        </div>
+                    {% endif %}
+                    {% for item in feet_list %}
+                        <div class="suggestion-card">
+                            <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <span class="empty-msg">No shoes found in your wardrobe</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <p><a href="{{ url_for('recommendation') }}" class="change-link">✕ Change item</a></p>
+
+    {% else %}
+        <h1>Choose a base item</h1>
+        <div class="clothes-grid">
+            {% for item in all_clothes %}
+                <div class="suggestion-card">
+                    <a href="{{ url_for('recommendation', item_id=item.id) }}" style="text-decoration: none; color: inherit;">
+                        <img src="{{ url_for('static', filename=item.image_path.replace('static/', '')) }}">
+                        <p style="margin-bottom: 10px;"><strong>{{ item.category }}</strong></p>
+                        <button class="btn-select">Select</button>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</main>
+{% endblock %}
