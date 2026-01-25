@@ -147,7 +147,7 @@
             
             <div class="outfit-builder">
                 <div class="outfit-row head-row" style="width: 60%; border-style: dashed;">
-                    {% set head_list = suggestions | selectattr("category", "equalto", "Chapeau") | list %}
+                    {% set head_list = suggestions | selectattr("category", "equalto", "Hat") | list %}
                     {% if reference_item.category == 'Chapeau' or head_list %}
                         {% if reference_item.category == 'Chapeau' %}
                             <div class="suggestion-card reference">
@@ -165,7 +165,7 @@
                 </div>
 
                 <div class="outfit-row top-row">
-                    {% set top_cats = ['T-shirt', 'Pull', 'Manteau', 'Veste', 'Chemise'] %}
+                    {% set top_cats = ['T-shirt', 'Longsleeve','Hoodie', 'Outwear', 'Blazer', 'Shirt','Dress'] %}
                     {% set top_list = suggestions | selectattr("category", "in", top_cats) | list %}
                     {% if reference_item.category in top_cats or top_list %}
                         {% if reference_item.category in top_cats %}
@@ -184,7 +184,7 @@
                 </div>
 
                 <div class="outfit-row bottom-row">
-                    {% set bottom_cats = ['Pantalon', 'Jean', 'Jupe'] %}
+                    {% set bottom_cats = ['Pants', 'Jean', 'Skirt'] %}
                     {% set bottom_list = suggestions | selectattr("category", "in", bottom_cats) | list %}
                     {% if reference_item.category in bottom_cats or bottom_list %}
                         {% if reference_item.category in bottom_cats %}
@@ -203,7 +203,7 @@
                 </div>
 
                 <div class="outfit-row feet-row" style="width: 70%; border-style: dashed;">
-                    {% set feet_list = suggestions | selectattr("category", "equalto", "Chaussures") | list %}
+                    {% set feet_list = suggestions | selectattr("category", "equalto", "Shoes") | list %}
                     {% if reference_item.category == 'Chaussures' or feet_list %}
                         {% if reference_item.category == 'Chaussures' %}
                             <div class="suggestion-card reference">
