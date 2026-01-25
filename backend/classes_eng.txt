@@ -1,0 +1,12 @@
+blazer
+dress
+hat
+hoodie
+longsleeve
+outwear
+pants
+shirt
+shoes
+shorts
+skirt
+t-shirt

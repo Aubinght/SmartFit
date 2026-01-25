@@ -30,7 +30,10 @@ def evaluate():
     # Upload original model
     model = models.resnet18(weights=None) #we will put our own weights
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, len(class_names))
+    model.fc = nn.Sequential(
+    nn.Dropout(0.3),
+    nn.Linear(num_ftrs, len(class_names))
+    )
     
     # Upload retrained model
     if os.path.exists(MODEL_PATH):
@@ -62,3 +65,7 @@ def evaluate():
 
 if __name__ == "__main__":
     evaluate()
+#----- Results on the last english model
+'''
+ Accuracy : 79.03% with kids
+'''

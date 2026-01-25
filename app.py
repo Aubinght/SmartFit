@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import os
 import random
 from backend.database import db, Clothing, init_db_app, User
-from backend.prediction_model_resnet18 import detect_clothing, save_image, detect_color, CATEGORIES, COLORS
+from backend.detect_eng import detect_clothing, save_image, detect_color, CATEGORIES, COLORS
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
@@ -144,21 +144,17 @@ def confirm_add():
         flash("Error: Confirmation data incomplete. Please try again", "error")
         return redirect(url_for('upload'))
     
-    #save (sql)
     try:
         new_item = Clothing(image_path=filepath, category=final_category, color=item_color, user_id=current_user.id)
         db.session.add(new_item)
         db.session.commit()
         
-        #success message
         flash(f"Your '{final_category}' was added to the wardrobe!", "success")
         return redirect(url_for('wardrobe'))
 
     except Exception as e:
-        #general error message
         flash(f"Database error: {e}", "error")
         return redirect(url_for('upload'))
-
 
 # Closet 
 # Displays all the clothes where "user_id" matches the user who is logged in
@@ -171,7 +167,7 @@ def wardrobe():
     else:
         all_clothes = Clothing.query.filter_by(user_id=current_user.id).all()
     #show only available categories
-    categories = db.session.query(Clothing.category).distinct().all()
+    categories = db.session.query(Clothing.category).filter_by(user_id=current_user.id).distinct().all()
     categories = [c[0] for c in categories]
     return render_template('wardrobe.html', clothes=all_clothes, categories=categories)
 
