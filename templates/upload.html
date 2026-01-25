@@ -115,7 +115,7 @@
                 <label for="final_color">Correct color :</label><br>
                 <select name="final_color" id="final_color" required>
                     {% for col in colors %}
-                        <option value="{{ col }}" {% if col|lower == predicted_category|lower %}selected{% endif %}>
+                        <option value="{{ col }}" {% if col|lower == predicted_color|lower %}selected{% endif %}>
                             {{ col }} {% if col|lower == predicted_color|lower %}(Detected){% endif %}
                         </option>
                     {% endfor %}
