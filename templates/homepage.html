@@ -1,109 +1,19 @@
-<html>  
-    <head>  
-        <title> SmartFit </title>
-    </head>
-   
-    <style>
-        .header {
-            background-color: #b7e9eb; 
-            padding: 40px; 
-            text-align: center; 
-            }
+{% extends "template.html" %}
 
-        .header h1 {
-            font-size: 4em; /* Big title */
-            color: #000; /* Black text */
-            margin: 0; /* Remove default margin */
-        }
-        
-        nav {
-            background-color: #b7e9eb; 
-            padding: 10px 0; 
-            text-align: center; 
-            }
+{% block content %}
+<style>
+    .home-flex { display: flex; align-items: center; justify-content: space-between; }
+    .taglines { flex: 1; }
+    .taglines p { font-size: 30px; margin: 20px 0; color: #2c3e50; }
+    .home-img { border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+</style>
 
-        nav ul {
-            list-style-type: none;  /* puces*/
-            margin: 0; 
-            padding: 0; 
-            display: flex;   /* horizontal menu */
-            justify-content: center; 
-        }
-
-        nav li {
-            margin: 0 15px; /*space between each element of the list*/
-        }
-
-        nav li a {
-            text-decoration: none; /* underlined */
-            color: #333; 
-            font-weight: 600; 
-            padding: 5px 10px;
-            background-color: #86b9bb;
-            border-radius: 3px;
-        }
-
-        nav li a:hover {
-            color: #628bb6; 
-        }
-
-        .content {
-            display: flex; 
-            align-items: center;
-            justify-content: space-between; 
-            padding: 40px;
-            max-width: 1200px;
-            margin: 0 auto; 
-            }
-
-        .taglines {
-            flex: 1; 
-            padding-right: 40px;
-            }
-
-        .taglines p {
-            font-size: 30px;
-            margin: 20px 0; 
-            color: #2c3e50;
-            }
-        .content img {
-            margin-left: 40px;
-            }
-
-    </style>
-
-    <body> 
-        <div class="header">
-            <h1> SMART FIT</h1>
-        </div>
-        
-         <!-- Horizontal menu --> 
-         <!-- On mettra les liens des autres pages à la place des # -->
-
-        <nav>
-            <ul>
-                <li><a href = "{{ url_for('wardrobe') }}">My wardrobe</a></li>
-                <li><a href = "{{ url_for('upload') }}">Upload</a></li>
-                <li><a href = "{{ url_for('recommendation') }}">Suggestions</a></li>
-            </ul>
-        </nav>
-        <div class="content">
-            <div class="taglines">
-                <p>Explore possibilities</p>
-                <p>Reconnect with your wardrobe</p>
-                <p>Discover new looks</p>
-            </div>
-        <img align = "center" alt="image accueil garde robe" src="{{ url_for('static', filename='images/photoHomepage2.jpg') }}" 
-        width="500"  />
-        </div>
-    </body>
-
-    {% if current_user.is_authenticated %}
-        <p>Hello, {{ current_user.username }}!</p>
-        <a href="{{ url_for('wardrobe') }}">My Wardrobe</a> |
-        <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-        <a href="{{ url_for('login') }}">Login</a> |
-        <a href="{{ url_for('signup') }}">Sign Up</a>
-    {% endif %}
-</html>
+<div class="home-flex">
+    <div class="taglines">
+        <p>Explore possibilities</p>
+        <p>Reconnect with your wardrobe</p>
+        <p>Discover new looks</p>
+    </div>
+    <img class="home-img" alt="image accueil" src="{{ url_for('static', filename='images/photoHomepage2.jpg') }}" width="500">
+</div>
+{% endblock %}

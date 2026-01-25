@@ -1,183 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Upload - SmartFit</title>
-    <style>
-        /* --- Styles globaux (identiques au reste du site) --- */
-        .header {
-            background-color: #b7e9eb; 
-            padding: 10px; 
-            text-align: center; 
-        }
+{% extends "template.html" %}
 
-        .header h1 a {
-            text-decoration: none;
-            font-size: 1em;
-            color: #000;
-            margin: 0;
-        }
-        
-        nav {
-            background-color: #b7e9eb; 
-            padding: 10px 0; 
-            text-align: center; 
-        }
+{% block title %}Upload - SmartFit{% endblock %}
 
-        nav ul {
-            list-style-type: none;
-            margin: 0; 
-            padding: 0; 
-            display: flex;
-            justify-content: center; 
-        }
+{% block content %}
+<style>
+    /* Styles spécifiques à l'Upload uniquement */
+    .upload-container {
+        background-color: #f9f9f9;
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
 
-        nav li {
-            margin: 0 15px;
-        }
+    .preview-img {
+        max-width: 250px;
+        height: auto;
+        border-radius: 10px;
+        border: 3px solid #86b9bb;
+        margin-bottom: 20px;
+    }
 
-        nav li a {
-            text-decoration: none;
-            color: #333; 
-            font-weight: 600; 
-            padding: 5px 10px;
-            background-color: #86b9bb;
-            border-radius: 3px;
-        }
+    .flash-messages {
+        list-style: none;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        background-color: #d4edda;
+        color: #155724;
+    }
 
-        nav li a:hover {
-            color: #628bb6; 
-        }
+    select {
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin: 10px 0;
+        width: 100%;
+        max-width: 300px;
+    }
 
-        /* --- Styles spécifiques à l'Upload --- */
-        main {
-            text-align: center;
-            padding: 40px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+    .step-title { color: #2c3e50; margin-bottom: 20px; }
+</style>
 
-        .upload-container {
-            background-color: #f9f9f9;
-            padding: 30px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .flash-messages {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 20px;
-        }
-
-        .flash-error { color: #721c24; background-color: #f8d7da; padding: 10px; border-radius: 5px; }
-        .flash-success { color: #155724; background-color: #d4edda; padding: 10px; border-radius: 5px; }
-
-        .preview-img {
-            max-width: 250px;
-            height: auto;
-            border-radius: 10px;
-            border: 3px solid #86b9bb;
-            margin-bottom: 20px;
-        }
-
-        button {
-            background-color: #86b9bb;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover { background-color: #628bb6; }
-
-        select {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin: 10px 0;
-        }
-    </style>
-</head>
-<body>
-<header class="header">
-        <h1><a href="{{ url_for('homepage') }}">SMART FIT</a></h1>
-    </header>
-
-    <nav>
-        <ul>
-            <li><a href="{{ url_for('wardrobe') }}">My wardrobe</a></li>
-            <li><a href="{{ url_for('upload') }}">Upload</a></li>
-            <li><a href="{{ url_for('recommendation') }}">Suggestions</a></li>
-        </ul>
-    </nav>
-    <main>
+<div class="upload-section">
     <h1>Add clothes to your wardrobe</h1>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </div>
       {% endif %}
     {% endwith %}
 
+    <div class="upload-container">
+        {% if not show_confirmation %}
+            <h2 class="step-title">Step 1: Upload your item</h2>
+            <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">            
+                <input type="file" name="file" required style="border: none; background: transparent;">
+                <br><br>
+                <button type="submit">Upload and analyze</button>
+            </form>
+        {% endif %}
 
-<div class="upload-container">
-    {% if not show_confirmation %}
-        <h2>Step 1 : Upload your item</h2>
-        <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">            
-            <input type="file" name="file" required>
-            <button type="submit">Upload and analyze</button>
-        </form>
-    {% endif %}
-
+        {% if show_confirmation and filepath and predicted_category %}
+            <h2 class="step-title">Step 2: Confirm category & color</h2>
+            
+            {% set img_filename = filepath.split('/')[-1] %}
+            <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" 
+                 alt="Garment to confirm" class="preview-img">
+            
+            <p>Color detected: 
+                <strong style="color: {{ predicted_color | default('black') }}; text-shadow: 0px 0px 2px #000;">
+                    {{ predicted_color | default('Unknown') }}
+                </strong>
+            </p>
+            <p>The model detected: <strong>{{ predicted_category }}</strong>. Is it correct?</p>
+            
+            <form method="POST" action="{{ url_for('confirm_add') }}">
+                <input type="hidden" name="filepath" value="{{ filepath }}">
+                <input type="hidden" name="item_color" value="{{ item_color }}">
+                
+                <label for="final_category">Final category:</label><br>
+                <select name="final_category" id="final_category" required>
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {% if cat|lower == predicted_category|lower %}selected{% endif %}>
+                            {{ cat }} {% if cat|lower == predicted_category|lower %}(Detected){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br>
+                <label for="final_color">Correct color:</label><br>
+                <select name="final_color" id="final_color" required>
+                    {% for col in colors %}
+                        <option value="{{ col }}" {% if col|lower == predicted_color|lower %}selected{% endif %}>
+                            {{ col }} {% if col|lower == predicted_color|lower %}(Detected){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <button type="submit">Confirm and add to the wardrobe</button>
+            </form>
+        {% endif %}
+    </div>
     
-    {% if show_confirmation and filepath and predicted_category %}
-    <h2>Step 2 : Confirm category</h2>
-    
-    {% set img_filename = filepath.split('/')[-1] %}
-    <img src="{{ url_for('static', filename='uploads/' + img_filename) }}" 
-         alt="Garment to confirm" style="max-width: 200px;">
-    
-    <p>Color detected: <strong style="color: {{ predicted_color }};">{{ predicted_color }}</strong></p>
-    <p>The model detected : <strong>{{ predicted_category }}</strong>. Is it correct ?</p>
-    
-    <form method="POST" action="{{ url_for('confirm_add') }}">
-        
-        <input type="hidden" name="filepath" value="{{ filepath }}">
-        <input type="hidden" name="item_color" value="{{ item_color }}">
-        
-        <label for="final_category">Final category :</label>
-        <select name="final_category" id="final_category" required>
-            {% for cat in categories %}
-                <option value="{{ cat }}" {% if cat|lower == predicted_category|lower %}selected{% endif %}>
-                    {{ cat }} {% if cat|lower == predicted_category|lower %}(Detected){% endif %}
-                </option>
-            {% endfor %}
-        </select>
-        <br>
-        <label for="final_color">Correct color :</label>
-        <select name="final_color" id="final_color" required>
-            {% for col in colors %}
-                <option value="{{ col }}" {% if col|lower == predicted_color|lower %}selected{% endif %}>
-                    {{ col }} {% if col|lower == predicted_color|lower %}(Detected){% endif %}
-                </option>
-            {% endfor %}
-        </select>
-        <br><br>
-        <button type="submit">Confirm and add to the wardrobe</button>
-    </form>
-{% endif %}
-</div>
-    
-    <p style="margin-top: 30px;">
-            <a href="{{ url_for('wardrobe') }}" style="color: #333;">← Back to wardrobe</a>
+    <p style="margin-top: 30px; text-align: center;">
+        <a href="{{ url_for('wardrobe') }}" style="color: #333; text-decoration: none; font-weight: bold;">← Back to wardrobe</a>
     </p>
-    </main>
-</body>
-</html>
+</div>
+{% endblock %}

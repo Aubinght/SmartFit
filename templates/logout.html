@@ -1,2 +1,9 @@
-<html>
-</html>
+{% extends "template.html" %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Logged Out</h2>
+    <p>You have been successfully disconnected.</p>
+    <a href="{{ url_for('login') }}">Click here to log back in</a>
+</div>
+{% endblock %}

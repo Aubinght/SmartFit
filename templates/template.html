@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}SmartFit{% endblock %}</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; }
+        .header { background-color: #b7e9eb; padding: 20px; text-align: center; }
+        .header h1 { font-size: 3em; color: #000; margin: 0; }
+        .header h1 a { text-decoration: none; color: inherit; }
+        
+        nav { background-color: #b7e9eb; padding: 10px 0; text-align: center; border-bottom: 2px solid #86b9bb; }
+        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; }
+        nav li { margin: 0 15px; }
+        nav li a { text-decoration: none; color: #333; font-weight: 600; padding: 8px 15px; background-color: #86b9bb; border-radius: 5px; transition: 0.3s; }
+        nav li a:hover { background-color: #628bb6; color: white; }
+
+        .user-info { font-size: 0.9em; margin-top: 10px; color: #555; }
+        .content { padding: 40px; max-width: 1200px; margin: 0 auto; }
+        
+        .form-container { max-width: 400px; margin: 0 auto; text-align: center; background: #f9f9f9; padding: 30px; border-radius: 10px; border: 1px solid #ddd; }
+        input { padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; width: 90%; }
+        button { background-color: #86b9bb; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #628bb6; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><a href="{{ url_for('homepage') }}">SMART FIT</a></h1>
+        {% if current_user.is_authenticated %}
+            <div class="user-info">Hello, <strong>{{ current_user.username }}</strong> !</div>
+        {% endif %}
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('homepage') }}">Home</a></li>
+            {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('wardrobe') }}">My wardrobe</a></li>
+                <li><a href="{{ url_for('upload') }}">Upload</a></li>
+                <li><a href="{{ url_for('recommendation') }}">Suggestions</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
