@@ -1,7 +1,6 @@
 import torch
 from torchvision import models, transforms
 from PIL import Image
-import os
 
 # Parameters
 IMG_PATH = "static/uploads/cloth_20251110_171257_713120.jpg"
